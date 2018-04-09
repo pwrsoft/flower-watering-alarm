@@ -1,0 +1,12 @@
+* Flower Watering Alarm
+
+- detect sunrise (rising light level: 0 -> 1 && speed of change > K)
+- defer notifications for N hours after detected sunrise
+- time sync internal clock at 00:00
+- reset button - gives alive status audio feedback
+- measure solar accumulated energy
+- measure accumulated water consumption/presence (soil resistance)
+- add audio notifications for under/over solar/water levels/total presence
+- add flexible deep sleep time (for event-triggered notifications, etc.)
+- use EEPROM for stats storage (solar energy, water levels, watering periods, etc.)
+- add changing desired soil resitance alarm trigger value (EEPROM)
