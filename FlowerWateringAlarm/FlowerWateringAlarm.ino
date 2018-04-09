@@ -6,6 +6,7 @@
 
 #include <avr/sleep.h>
 #include <avr/wdt.h>
+#include <EEPROM.h>
 
 #define LED_PIN 13
 #define BUZZER 2
@@ -15,6 +16,14 @@
 #define LIGHT_PIN A1
 
 #define SLEEP_MINUTES 1
+#define SOIL_RESISTANCE_THRESHOLD_DEFAULT_VALUE 250
+#define SOIL_RESISTANCE_THRESHOLD_EEPROM_ADDRESS 0
+
+int soil_resistance_threshold;
+
+int addr = 0;
+byte value;
+
 
 // watchdog interrupt
 ISR(WDT_vect) 
@@ -45,6 +54,22 @@ void setup()
   beep(600,500);
   beep(800,500);
   beep(1000,500);
+  
+  /*
+  Serial.println("*** Initializing EERPOM with default SOIL_RESISTANCE_THRESHOLD value: " + String(SOIL_RESISTANCE_THRESHOLD_DEFAULT_VALUE));
+  EEPROM.write(SOIL_RESISTANCE_THRESHOLD_EEPROM_ADDRESS, SOIL_RESISTANCE_THRESHOLD_DEFAULT_VALUE);
+  value = EEPROM.read(SOIL_RESISTANCE_THRESHOLD_EEPROM_ADDRESS);
+  Serial.println("Read SOIL_RESISTANCE_THRESHOLD_EEPROM: " + String(value));
+  if (value == 0 || value == 255) {
+    soil_resistance_threshold =  SOIL_RESISTANCE_THRESHOLD_DEFAULT_VALUE;
+    EEPROM.write(SOIL_RESISTANCE_THRESHOLD_EEPROM_ADDRESS, soil_resistance_threshold);
+  } else {
+    soil_resistance_threshold = value;
+  }
+  */
+  
+  soil_resistance_threshold = SOIL_RESISTANCE_THRESHOLD_DEFAULT_VALUE;
+
 }  // end of setup
 
 void loop()
@@ -68,14 +93,24 @@ void loop()
   Serial.print("Light Level: ");
   Serial.println(light_level);
   
-  Serial.print("Soil Resistance: ");
-  Serial.print(a);
+  Serial.print("Soil Resistance:");
   Serial.print(" (");
   Serial.print(b);
-  Serial.println(") ");
+  Serial.print(") ");
+  Serial.print(a);
+  Serial.print(" < ");
+  Serial.print(soil_resistance_threshold);
+  Serial.println();
 
   // signal only in day-light
-  if (light_level > 100 && (a >= 400 || b == HIGH)) {
+  // light level > 100 at evening indoor lamp on light
+  // light level > 700 at daylight
+  if (light_level > 100 && light_level < 755
+      && (a >= soil_resistance_threshold || b == HIGH)) {
+ /* Soui resistances:
+   >160-225d when watered
+   355 after > 1 week
+ */
     beep(2000,20);
     delay(150);
     beep(2000,20);
