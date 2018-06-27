@@ -15,8 +15,9 @@
 #define POWER_OUT 4
 #define LIGHT_PIN A1
 
-#define SLEEP_MINUTES 1
-#define SOIL_RESISTANCE_THRESHOLD_DEFAULT_VALUE 250
+#define VERSION "v0.2"
+#define SLEEP_MINUTES 5
+#define SOIL_RESISTANCE_THRESHOLD_DEFAULT_VALUE 200
 #define SOIL_RESISTANCE_THRESHOLD_EEPROM_ADDRESS 0
 
 int soil_resistance_threshold;
@@ -45,6 +46,7 @@ void myWatchdogEnable(const byte interval)
 void setup()
 {
   Serial.begin(115200);              //  setup serial
+  Serial.println(VERSION);
   pinMode(LED_PIN, OUTPUT);
   pinMode(LIGHT_PIN, INPUT);
   pinMode(SOIL_ANALOG, INPUT);
@@ -94,12 +96,17 @@ void loop()
   Serial.println(light_level);
   
   Serial.print("Soil Resistance:");
-  Serial.print(" (");
+  /*
+  //Serial.print(" (DO=");
   Serial.print(b);
   Serial.print(") ");
+  */
+  Serial.print(" (");
   Serial.print(a);
   Serial.print(" < ");
   Serial.print(soil_resistance_threshold);
+  Serial.print(") ");
+  Serial.print(a < soil_resistance_threshold ? "OK" : "LOW!");
   Serial.println();
 
   // signal only in day-light
